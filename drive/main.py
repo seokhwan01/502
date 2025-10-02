@@ -146,7 +146,7 @@ def processing_loop():
                         offset = center_smooth - cx
                         steering_angle = offset * PIXEL_TO_DEG
                         # [추가됨] 트랙 끝(offset 급증)에서 직진하도록 하는 안전장치
-                        if abs(offset) > 40:
+                        if abs(offset) > 80:
                             motor.forward(shared_data["current_speed"])
                             base_state_text = "RUNNING (OFFSET LOCK)"
                         elif offset > 15:
@@ -188,7 +188,7 @@ def processing_loop():
                         print(f"✅ 차선 변경 확정 → {candidate_lane}")
                         last_lane = candidate_lane
 
-            time.sleep(0.05)
+            # time.sleep(0.05)
     finally:  # <-- 반드시 finally로 자원 정리
         motor.stop()
         picam2.stop()
