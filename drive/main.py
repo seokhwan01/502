@@ -31,6 +31,7 @@ MOTOR_PINS = {
     'M1_DIR': 18, 'M1_PWM': 19, 'M2_DIR': 20, 'M2_PWM': 21,
     'M3_DIR': 22, 'M3_PWM': 23, 'M4_DIR': 24, 'M4_PWM': 25,
 }
+
 W, H, FPS = 640, 360, 24
 CAMERA_FOV_DEG = 62.0
 PIXEL_TO_DEG = CAMERA_FOV_DEG / W
