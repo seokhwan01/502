@@ -128,8 +128,10 @@ def processing_loop():
                 if shared_data["manual_stop"]:
                     motor.stop(); base_state_text = "MANUAL STOP"
                 elif shared_data["is_manual_turning"] == "right":
+                    print("---------------right-------------")
                     motor.right_turn(); steering_angle = 30.0; base_state_text = "MANUAL TURN"
                 elif shared_data["is_manual_turning"] == "left":
+                    print("---------------left-------------")
                     motor.left_turn(); steering_angle = -30.0; base_state_text = "MANUAL TURN"
                 elif shared_data["is_moving_backward"]:
                     motor.backward(); base_state_text = "BACKWARD"
