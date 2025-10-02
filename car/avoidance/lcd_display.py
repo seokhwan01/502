@@ -53,6 +53,12 @@ class LcdDisplay:
         time.sleep(0.005)
 
     def print_line(self, line, message):
+        # 먼저 라인 전체 지움 (공백으로 채움)
+        clear_msg = " " * self.LCD_WIDTH
+        self._write(self.LINE_ADDR[line], self.LCD_CMD)
+        for char in clear_msg:
+            self._write(ord(char), self.LCD_CHR)
+
         message = message.ljust(self.LCD_WIDTH, " ")
         self._write(self.LINE_ADDR[line], self.LCD_CMD)
         for char in message[:self.LCD_WIDTH]:
@@ -68,13 +74,13 @@ class LcdDisplay:
 
         # 상태 표시
         if state == "approaching" and minutes is not None:
-            self.print_line(3, "Approaching")
+            self.print_line(3, "Approaching".ljust(self.LCD_WIDTH))
         elif state == "nearby":
-            self.print_line(3, "Nearby")
+            self.print_line(3, "Nearby".ljust(self.LCD_WIDTH))
         elif state == "idle":
-            self.print_line(3, "Idle")
+            self.print_line(3, "Idle".ljust(self.LCD_WIDTH))
         else:
-            self.print_line(3, "")
+            self.print_line(3, "ERROR".ljust(self.LCD_WIDTH))
 
     def start(self):
         try:
