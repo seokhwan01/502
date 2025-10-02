@@ -58,7 +58,7 @@ class LcdDisplay:
         for char in message[:self.LCD_WIDTH]:
             self._write(ord(char), self.LCD_CHR)
 
-    def update_eta(self, minutes):
+    def update_eta(self, minutes, state):
         self._latest_eta_minutes = minutes
         eta_text = f"ETA: {minutes:02d} min" if minutes is not None else "ETA: -- min"
 

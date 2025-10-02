@@ -18,7 +18,6 @@ with open(CONFIG_PATH, "r") as f:
 
 MQTT_BROKER = config.get("MQTT_BROKER", "localhost")
 MQTT_PORT   = config.get("MQTT_PORT", 1883)
-MQTT_TOPIC  = config.get("MQTT_TOPIC", "car/current_lane")
 
 # --- MQTT 클라이언트 초기화 ---
 mqtt_client = mqtt.Client()
@@ -101,9 +100,8 @@ def api_control():
 # --- 메인 루프 ---
 def processing_loop():
     global last_lane, candidate_lane, candidate_count  # 전역 변수 사용 선언
-    picam2.start(); time.sleep(0.2) 
-    # ret, frame = cap.read()
-    time.sleep(0.2)
+    picam2.start(); 
+    time.sleep(0.2) 
     
     try:
         while shared_data["running"]:
@@ -168,6 +166,7 @@ def processing_loop():
                     "state_text": state_text,
                     "steering_angle": round(steering_angle, 2)
                 })
+
                 # --- 영상 소켓 송출 ---
                 ok, buf = cv2.imencode(".jpg", vis_frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
                 if ok:
@@ -188,7 +187,6 @@ def processing_loop():
                         print(f"✅ 차선 변경 확정 → {candidate_lane}")
                         last_lane = candidate_lane
 
-            # time.sleep(0.05)
     finally:  # <-- 반드시 finally로 자원 정리
         motor.stop()
         picam2.stop()

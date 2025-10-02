@@ -39,8 +39,7 @@ class Car:
             print(f"\n🚗 내 차량 위치 업데이트: {pos}")
             # self.send_position(pos)
             self.index += 1
-            time.sleep(2.0)  # 10초마다 이동
-
+            time.sleep(2.0)  
     def start(self):
         t = threading.Thread(target=self.drive_loop, daemon=True)
         t.start()
