@@ -3,7 +3,7 @@ import time
 import threading
 
 class Car:
-    def __init__(self, client, coords, car_id="11가 1111", total_lanes=3 ,car_lane=1): 
+    def __init__(self, client, coords, car_id="22ga 2222", total_lanes=3 ,car_lane=2): 
         self.client = client
         self.coords = coords
         self.car_id = car_id
@@ -18,7 +18,7 @@ class Car:
             "car": self.car_id,
             "current": pos
         }
-        self.client.publish(self.topic, json.dumps(payload, ensure_ascii=False))
+        # self.client.publish(self.topic, json.dumps(payload, ensure_ascii=False))
         print(f"📤 내 차량 좌표 발행 → {payload}")
     
     def send_feedback(self, pos, same_road_and_dir):
@@ -37,9 +37,10 @@ class Car:
         while self.index < len(self.coords):
             pos = self.coords[self.index]
             print(f"\n🚗 내 차량 위치 업데이트: {pos}")
-            # self.send_position(pos)
+            self.send_position(pos)
             self.index += 1
-            time.sleep(2.0)  
+            time.sleep(2.5)  # 10초마다 이동
+
     def start(self):
         t = threading.Thread(target=self.drive_loop, daemon=True)
         t.start()

@@ -34,7 +34,9 @@ class AmbulanceStatus:
                 return None, None, None, None
             
             # 네비 API 응답: routes → sections → roads
-            roads = route_info["routes"][0]["sections"][0]["roads"]
+            roads = []
+            for sec in route_info["routes"][0]["sections"]:
+                roads.extend(sec["roads"])
 
             # (1) 내 위치와 구급차 위치를 각 도로 vertex와 비교 → 가장 가까운 도로 index 탐색
             my_idx = min(range(len(roads)),
@@ -102,10 +104,10 @@ class AmbulanceStatus:
             dist_m = haversine(my_pos["lat"], my_pos["lng"], current["lat"], current["lng"])
 
             # ✅ 교차 여부 추적
-            if dist_m < 30:  # 30m 이내로 붙은 적 있으면 교차 플래그 ON
+            if dist_m < 100:  # 30m 이내로 붙은 적 있으면 교차 플래그 ON
                 self.crossed = True
 
-            if self.crossed and dist_m > 30:  # 다시 멀어짐 → 지나간 것으로 확정
+            if self.crossed and dist_m > 100:  # 다시 멀어짐 → 지나간 것으로 확정
                 print("🚑 구급차가 이미 지나감 → idle 처리")
                 return None, None, False, False
 
@@ -117,7 +119,7 @@ class AmbulanceStatus:
                 print("같은 경로")
                 is_same_road_and_dir = True
             
-            elif dist_m <= 500:   # 500m 이내면 '주변'
+            elif dist_m <= 500:   # 200m 이내면 '주변'
                 print("⚠️ 다른 경로지만 가까움")
                 is_nearby = True
                 print(f"eta : {eta}, dist : {dist_m}, same_road : {is_same_road_and_dir}")

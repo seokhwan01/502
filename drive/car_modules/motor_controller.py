@@ -1,30 +1,3 @@
-# # --- 더미 모터 클래스 (노트북용 테스트) ---
-# class MotorController:
-#     def __init__(self, pins=None):
-#         self.SPEED_FWD = 0.15
-#         self.SPEED_TURN = 0.30
-#         print("[DummyMotor] 초기화 완료 (실제 GPIO 제어 없음)")
-
-#     def _stop_all_pwm(self):
-#         print("[DummyMotor] PWM ALL STOP")
-
-#     def forward(self, speed=None):
-#         if speed is None:
-#             speed = self.SPEED_FWD
-#         print(f"[DummyMotor] FORWARD, speed={speed:.2f}")
-
-#     def backward(self):
-#         print(f"[DummyMotor] BACKWARD, speed={self.SPEED_FWD:.2f}")
-
-#     def right_turn(self):
-#         print(f"[DummyMotor] RIGHT TURN, speed={self.SPEED_TURN:.2f}")
-
-#     def left_turn(self):
-#         print(f"[DummyMotor] LEFT TURN, speed={self.SPEED_TURN:.2f}")
-
-#     def stop(self):
-#         pass
-#         # print("[DummyMotor] STOP")
 
 from gpiozero import LED, PWMLED
 

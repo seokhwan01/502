@@ -4,7 +4,6 @@ import paho.mqtt.client as mqtt
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, emit
 from picamera2 import Picamera2
-
 # --- Car 관련 모듈 ---
 from car_modules.motor_controller import MotorController
 from car_modules.lane_detector import LaneDetector
@@ -33,7 +32,6 @@ MOTOR_PINS = {
     'M1_DIR': 18, 'M1_PWM': 19, 'M2_DIR': 20, 'M2_PWM': 21,
     'M3_DIR': 22, 'M3_PWM': 23, 'M4_DIR': 24, 'M4_PWM': 25,
 }
-
 W, H, FPS = 640, 360, 24
 CAMERA_FOV_DEG = 62.0
 PIXEL_TO_DEG = CAMERA_FOV_DEG / W
@@ -42,13 +40,6 @@ PIXEL_TO_DEG = CAMERA_FOV_DEG / W
 picam2 = Picamera2()
 cfg = picam2.create_video_configuration(main={"size": (W,H), "format":"RGB888"}, controls={"FrameRate": FPS})
 picam2.configure(cfg)
-
-
-
-last_lane = None        # 마지막 확정된 차선
-candidate_lane = None   # 후보 차선
-candidate_count = 0     # 후보 차선이 연속으로 들어온 횟수
-STABLE_THRESHOLD = 3    # 몇 번 연속 들어와야 확정할지
 
 
 motor = MotorController(MOTOR_PINS)
@@ -104,14 +95,13 @@ def api_control():
 def processing_loop():
     global last_lane, candidate_lane, candidate_count  # 전역 변수 사용 선언
     picam2.start(); 
-    time.sleep(0.2) 
-    
+    time.sleep(0.2)
+
     try:
         while shared_data["running"]:
-            frame = picam2.capture_array()
+            frame = picam2.capture_array(); 
             h, w = frame.shape[:2]
             cx = w//2 
-           
 
             try:
                 result = detector.process_frame(frame)
@@ -130,10 +120,8 @@ def processing_loop():
                 if shared_data["manual_stop"]:
                     motor.stop(); base_state_text = "MANUAL STOP"
                 elif shared_data["is_manual_turning"] == "right":
-                    print("---------------right-------------")
                     motor.right_turn(); steering_angle = 30.0; base_state_text = "MANUAL TURN"
                 elif shared_data["is_manual_turning"] == "left":
-                    print("---------------left-------------")
                     motor.left_turn(); steering_angle = -30.0; base_state_text = "MANUAL TURN"
                 elif shared_data["is_moving_backward"]:
                     motor.backward(); base_state_text = "BACKWARD"
@@ -169,29 +157,16 @@ def processing_loop():
                     "state_text": state_text,
                     "steering_angle": round(steering_angle, 2)
                 })
-
                 # --- 영상 소켓 송출 ---
                 ok, buf = cv2.imencode(".jpg", vis_frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
                 if ok:
                     jpg_as_text = base64.b64encode(buf).decode('utf-8') 
                     socketio.emit("video_frame", {"img": jpg_as_text})
 
-                # --- current_lane만 MQTT로 송출 --- 추가
-                if current_lane is not None:
-                    if current_lane == candidate_lane:
-                        candidate_count += 1
-                    else:
-                        candidate_lane = current_lane
-                        candidate_count = 1
-
-                    # 후보가 3번 연속 나오면 확정 발송
-                    if candidate_count >= STABLE_THRESHOLD and candidate_lane != last_lane:
-                        mqtt_client.publish("car1/current_lane", int(candidate_lane))
-                        print(f"✅ 차선 변경 확정 → {candidate_lane}")
-                        last_lane = candidate_lane
 
     finally:  # <-- 반드시 finally로 자원 정리
         motor.stop()
+        # cap.release()
         picam2.stop()
 
 # --- 실행 ---
